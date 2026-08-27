@@ -1,0 +1,11 @@
+/* main stylesheet for mawanella tourism site */
+/* student project: abdulla mt (E2410182) */
+
+@import url('variables.css');
+@import url('layout.css');
+@import url('components.css');
+@import url('home.css');
+@import url('details.css');
+@import url('admin.css');
+@import url('gallery.css');
+@import url('mobile.css');
