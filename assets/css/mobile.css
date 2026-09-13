@@ -1,0 +1,32 @@
+/* mobile layout */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .hero h1 {
+    font-size: 1.7rem;
+  }
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  .search-box {
+    flex-direction: column;
+  }
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .gallery-item { 
+    flex: 1 1 calc(50% - 12px); 
+    height: 150px; 
+  }
+  .gallery-item:first-child { 
+    height: 250px; 
+  }
+  .lightbox-prev { 
+    left: 10px; 
+  }
+  .lightbox-next { 
+    right: 10px; 
+  }
+}
