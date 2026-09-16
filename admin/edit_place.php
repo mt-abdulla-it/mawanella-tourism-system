@@ -55,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lat = !empty($_POST['latitude']) ? floatval($_POST['latitude']) : null;
         $lng = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
         $facil = trim($_POST['facilities']);
+        $fees = trim($_POST['entrance_fees']);
 
         if (empty($name) || $catId <= 0 || empty($desc) || $dist <= 0) {
             $error = "Please fill in all required fields.";
@@ -160,11 +161,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                       estimated_time = ?, 
                                                       latitude = ?, 
                                                       longitude = ?, 
-                                                      facilities = ?
+                                                      facilities = ?,
+                                                      entrance_fees = ?
                                                       WHERE place_id = ?");
                 
-                mysqli_stmt_bind_param($update_stmt, "sisssdsddsi", 
-                    $name, $catId, $desc, $hours, $tips, $dist, $estTime, $lat, $lng, $facil, $id
+                mysqli_stmt_bind_param($update_stmt, "sisssdsddssi", 
+                    $name, $catId, $desc, $hours, $tips, $dist, $estTime, $lat, $lng, $facil, $fees, $id
                 );
 
                 if (mysqli_stmt_execute($update_stmt)) {

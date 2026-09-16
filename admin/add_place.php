@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lat = !empty($_POST['latitude']) ? floatval($_POST['latitude']) : null;
         $lng = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
         $facil = trim($_POST['facilities']);
+        $fees = trim($_POST['entrance_fees']);
 
         if (empty($name) || $catId <= 0 || empty($desc) || $dist <= 0) {
             $error = "Please fill in all required fields (Name, Category, Description, Distance).";
@@ -48,11 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if (empty($error)) {
-                $stmt = mysqli_prepare($conn, "INSERT INTO places (name, category_id, description, opening_hours, travel_tips, distance, estimated_time, latitude, longitude, facilities) 
-                                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = mysqli_prepare($conn, "INSERT INTO places (name, category_id, description, opening_hours, travel_tips, distance, estimated_time, latitude, longitude, facilities, entrance_fees) 
+                                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 
-                mysqli_stmt_bind_param($stmt, "sisssdsdds", 
-                    $name, $catId, $desc, $hours, $tips, $dist, $estTime, $lat, $lng, $facil
+                mysqli_stmt_bind_param($stmt, "sisssdsddss", 
+                    $name, $catId, $desc, $hours, $tips, $dist, $estTime, $lat, $lng, $facil, $fees
                 );
 
                 if (mysqli_stmt_execute($stmt)) {

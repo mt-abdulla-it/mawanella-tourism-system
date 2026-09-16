@@ -21,7 +21,8 @@ INSERT INTO `categories` (`category_id`, `category_name`) VALUES
 (3, 'Religious / Heritage'),
 (4, 'Heritage / Monument'),
 (5, 'Nature / Wildlife'),
-(6, 'Nature / Waterfall');
+(6, 'Nature / Waterfall'),
+(7, 'Family Friendly');
 
 CREATE TABLE `places` (
   `place_id` INT AUTO_INCREMENT PRIMARY KEY,
@@ -35,12 +36,13 @@ CREATE TABLE `places` (
   `latitude` DECIMAL(10,8) DEFAULT NULL,
   `longitude` DECIMAL(11,8) DEFAULT NULL,
   `facilities` TEXT,
+  `entrance_fees` VARCHAR(100) DEFAULT 'Free',
   `last_updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`category_id`) REFERENCES `categories`(`category_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `places` (`place_id`, `name`, `category_id`, `description`, `opening_hours`, `travel_tips`, `distance`, `estimated_time`, `latitude`, `longitude`, `facilities`) VALUES
-(1, 'Uthuwankanda Saradiel Village', 1, 'Theme village setup about Saradiel hero with statues and history details about old Mawanella area.', '8:30 AM - 5:30 PM', 'Wear comfortable walking shoes. Good to get local guide for history details.', 5.70, '2 - 3 hours', 7.25150000, 80.44910000, 'Parking, Restrooms, Local Food Stall, Guided Tours'),
+INSERT INTO `places` (`place_id`, `name`, `category_id`, `description`, `opening_hours`, `travel_tips`, `distance`, `estimated_time`, `latitude`, `longitude`, `facilities`, `entrance_fees`) VALUES
+(1, 'Uthuwankanda Saradiel Village', 1, 'Theme village setup about Saradiel hero with statues and history details about old Mawanella area.', '8:30 AM - 5:30 PM', 'Wear comfortable walking shoes. Good to get local guide for history details.', 5.70, '2 - 3 hours', 7.25150000, 80.44910000, 'Parking, Restrooms, Local Food Stall, Guided Tours', 'LKR 500'),
 
 (2, 'Bo Ella Waterfall', 2, 'Small hidden waterfall in Uthuwankanda area with peaceful rocks and trees. Good spot for relaxing and pictures.', '6:00 AM - 6:00 PM', 'Path can get slippery when raining. Be careful near rocks.', 5.80, '1 - 2 hours', 7.24310000, 80.46120000, 'Parking nearby, Viewing Spot'),
 
@@ -52,9 +54,9 @@ INSERT INTO `places` (`place_id`, `name`, `category_id`, `description`, `opening
 
 (6, 'Meeyan Ella Waterfall', 6, 'Waterfall near old railway line. Popular place for trekking and nature photography.', '7:00 AM - 5:30 PM', 'Trek path near railway line needs extra care. Go early morning.', 9.90, '2 hours', 7.26110000, 80.51420000, 'Walking Trail, Viewpoint'),
 
-(7, 'Pinnawala Zoo', 5, 'Open layout zoo near Pinnawala featuring native animals and birds of Sri Lanka.', '8:30 AM - 5:30 PM', 'Can visit both zoo and elephant orphanage on same day.', 16.00, '2 - 3 hours', 7.30210000, 80.38720000, 'Parking, Restaurants, Souvenir Shop, Restrooms'),
+(7, 'Pinnawala Zoo', 7, 'Open layout zoo near Pinnawala featuring native animals and birds of Sri Lanka.', '8:30 AM - 5:30 PM', 'Can visit both zoo and elephant orphanage on same day.', 16.00, '2 - 3 hours', 7.30210000, 80.38720000, 'Parking, Restaurants, Souvenir Shop, Restrooms', 'LKR 2000'),
 
-(8, 'Pinnawala Elephant Orphanage', 5, 'Famous elephant center where you can watch elephants bathing in river and feeding.', '8:30 AM - 5:30 PM', 'River bath times are 10:00 AM and 2:00 PM. Go early to get good place.', 17.00, '3 - 4 hours', 7.30110000, 80.38610000, 'Cafeteria, Restrooms, Parking, Shops'),
+(8, 'Pinnawala Elephant Orphanage', 7, 'Famous elephant center where you can watch elephants bathing in river and feeding.', '8:30 AM - 5:30 PM', 'River bath times are 10:00 AM and 2:00 PM. Go early to get good place.', 17.00, '3 - 4 hours', 7.30110000, 80.38610000, 'Cafeteria, Restrooms, Parking, Shops', 'LKR 3000'),
 
 (9, 'Asupini Ella Waterfall', 6, 'Large waterfall near Aranayaka side with high views and scenic countryside walk.', '7:00 AM - 5:00 PM', 'Need to trek down path. Take water bottle and wear good shoes.', 18.00, '2 - 3 hours', 7.18950000, 80.47980000, 'Viewing Deck, Local Snacks'),
 

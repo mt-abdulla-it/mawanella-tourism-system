@@ -100,6 +100,10 @@ mysqli_stmt_close($img_stmt);
             <h3><i class="fa-solid fa-hourglass-half"></i> Visit Time</h3>
             <p><?= escape($place['estimated_time']); ?></p>
           </div>
+          <div>
+            <h3><i class="fa-solid fa-ticket"></i> Entrance Fee</h3>
+            <p><?= !empty($place['entrance_fees']) ? escape($place['entrance_fees']) : 'Free'; ?></p>
+          </div>
         </div>
 
         <?php if (!empty($place['travel_tips'])): ?>
