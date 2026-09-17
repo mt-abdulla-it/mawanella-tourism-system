@@ -111,6 +111,7 @@ $placesRes = mysqli_stmt_get_result($stmt);
             <div class="meta-info">
               <span><i class="fa-regular fa-clock"></i> <?= escape($place['opening_hours']); ?></span>
               <span><i class="fa-solid fa-hourglass-half"></i> <?= escape($place['estimated_time']); ?></span>
+              <span><i class="fa-solid fa-ticket"></i> <?= !empty($place['entrance_fees']) ? escape($place['entrance_fees']) : 'Free'; ?></span>
             </div>
 
             <div class="card-actions">
