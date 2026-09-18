@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("CSRF check failed.");
     }
 
-    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $id = isset($_POST['place_id']) ? intval($_POST['place_id']) : 0;
 
     if ($id > 0) {
         // Fetch all images for this place to delete from server
