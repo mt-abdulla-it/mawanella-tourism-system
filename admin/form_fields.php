@@ -71,12 +71,12 @@
     <div class="admin-image-preview-wrapper">
       <p class="admin-image-preview-title">Current Images (Check to Delete):</p>
       <div class="admin-image-preview-grid">
-        <?php foreach ($existing_images as $img): ?>
+        <?php foreach ($place_images as $img): ?>
           <div class="admin-image-item">
             <img src="../<?= escape($img['image_path']); ?>" class="admin-image-thumb">
             <div class="admin-image-actions">
               <label class="admin-image-label">
-                <input type="radio" name="main_image_id" value="<?= $img['image_id']; ?>" <?= ($img['is_main']) ? 'checked' : ''; ?>>
+                <input type="radio" name="primary_image" value="<?= $img['image_id']; ?>" <?= ($img['is_primary']) ? 'checked' : ''; ?>>
                 Main
               </label>
               <label class="admin-image-label-danger">
