@@ -144,6 +144,7 @@ $totalPages = ceil($totalRows / $limit);
                   </a>
                   
                   <form action="delete_place.php" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete <?= addslashes($place['name']); ?>?');">
+                    <input type="hidden" name="csrf_token" value="<?= generate_csrf(); ?>">
                     <input type="hidden" name="place_id" value="<?= $place['place_id']; ?>">
                     <button type="submit" class="btn btn-danger btn-admin-action">
                       <i class="fa-solid fa-trash"></i> Delete
