@@ -144,10 +144,6 @@ mysqli_stmt_close($img_stmt);
 
 </div>
 
-<script src="assets/js/map.js"></script>
-<!-- Google Maps JavaScript API -->
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATsyhCIT9v9ONMtxAUNa_7e_pQGQt6MxE&callback=initMap"></script>
-
 <!-- Lightbox Modal -->
 <div id="galleryLightbox" class="lightbox">
     <div class="lightbox-content">
@@ -157,8 +153,6 @@ mysqli_stmt_close($img_stmt);
         <button class="lightbox-nav lightbox-next" onclick="changeImage(1)"><i class="fa-solid fa-chevron-right"></i></button>
     </div>
 </div>
-
-<?php include 'includes/footer.php'; ?>
 
 <script>
 // Lightbox Javascript Logic
@@ -201,3 +195,9 @@ document.addEventListener('keydown', function(e) {
     }
 });
 </script>
+
+<script src="assets/js/map.js"></script>
+<!-- Google Maps JavaScript API -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATsyhCIT9v9ONMtxAUNa_7e_pQGQt6MxE&callback=initMap"></script>
+
+<?php include 'includes/footer.php'; ?>
