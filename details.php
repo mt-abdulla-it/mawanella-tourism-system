@@ -200,4 +200,4 @@ document.addEventListener('keydown', function(e) {
 <!-- Google Maps JavaScript API -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATsyhCIT9v9ONMtxAUNa_7e_pQGQt6MxE&callback=initMap"></script>
 
-<?php include 'includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>
