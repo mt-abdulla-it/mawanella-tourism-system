@@ -77,6 +77,11 @@
   background-color: #dc2626;
 }
 
+.btn-small {
+  padding: 5px 12px;
+  font-size: 0.82rem;
+}
+
 /* forms */
 .form-card {
   max-width: 650px;
