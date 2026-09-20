@@ -29,4 +29,40 @@
   .lightbox-next { 
     right: 10px; 
   }
+  /* planner card timeline fix for mobile */
+  .planner-list {
+    padding-left: 0;
+  }
+  .planner-list::before {
+    display: none;
+  }
+  .planner-card {
+    margin-left: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .planner-item-index {
+    position: static;
+    transform: none;
+    margin-bottom: 4px;
+  }
+  .planner-item-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .planner-item-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .meta-info {
+    flex-direction: column;
+    gap: 6px;
+  }
 }
