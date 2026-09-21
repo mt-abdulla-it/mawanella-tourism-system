@@ -118,9 +118,12 @@ function initMap() {
     animation: google.maps.Animation.DROP
   });
 
-  // popup when marker is clicked
+  // popup when marker is clicked (use textContent to prevent xss)
+  const infoDiv = document.createElement('div');
+  infoDiv.style.cssText = 'padding:8px; font-weight:600; color:#0f766e;';
+  infoDiv.textContent = title;
   const infowindow = new google.maps.InfoWindow({
-    content: '<div style="padding:8px; font-weight:600; color:#0f766e;">' + title + '</div>'
+    content: infoDiv
   });
 
   marker.addListener('click', function () {
