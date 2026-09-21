@@ -2,12 +2,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Preloader
   const preloader = document.getElementById('preloader');
   if (preloader) {
-    window.addEventListener('load', () => {
+    const hidePreloader = () => {
       preloader.style.opacity = '0';
       setTimeout(() => {
         preloader.style.display = 'none';
       }, 500);
-    });
+    };
+
+    if (document.readyState === 'complete') {
+      hidePreloader();
+    } else {
+      window.addEventListener('load', hidePreloader);
+    }
   }
 
   // 2. Dark Mode Toggle
@@ -66,10 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (type === 'error') iconClass = 'fa-exclamation-circle';
     if (type === 'warning') iconClass = 'fa-triangle-exclamation';
 
-    toast.innerHTML = `
-      <div class="toast-icon"><i class="fa-solid ${iconClass}"></i></div>
-      <div class="toast-message">${message}</div>
-    `;
+    // Use textContent to prevent XSS
+    const iconDiv = document.createElement('div');
+    iconDiv.className = 'toast-icon';
+    iconDiv.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'toast-message';
+    messageDiv.textContent = message;
+
+    toast.appendChild(iconDiv);
+    toast.appendChild(messageDiv);
 
     container.appendChild(toast);
 
