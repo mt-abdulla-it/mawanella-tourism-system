@@ -51,16 +51,31 @@
   <textarea id="travel_tips" name="travel_tips" rows="2" placeholder="Wear proper trekking shoes, carry water..."><?= isset($place['travel_tips']) ? escape($place['travel_tips']) : ''; ?></textarea>
 </div>
 
+<div class="form-group">
+  <label for="local_cuisine">Local Cuisine Tips</label>
+  <textarea id="local_cuisine" name="local_cuisine" rows="2" placeholder="Nearby local foods to try..."><?= isset($place['local_cuisine']) ? escape($place['local_cuisine']) : ''; ?></textarea>
+</div>
+
+<div class="form-group">
+  <label for="travel_routes">Travel Routes</label>
+  <textarea id="travel_routes" name="travel_routes" rows="2" placeholder="How to get there from Mawanella..."><?= isset($place['travel_routes']) ? escape($place['travel_routes']) : ''; ?></textarea>
+</div>
+
 <div class="form-grid-2">
+  <div class="form-group">
+    <label for="travel_time">Travel Time (from Mawanella)</label>
+    <input type="text" id="travel_time" name="travel_time" placeholder="e.g. 30 mins" value="<?= isset($place['travel_time']) ? escape($place['travel_time']) : ''; ?>">
+  </div>
+
   <div class="form-group">
     <label for="facilities">Facilities Available</label>
     <input type="text" id="facilities" name="facilities" placeholder="Parking, Food Stalls, Restrooms..." value="<?= isset($place['facilities']) ? escape($place['facilities']) : ''; ?>">
   </div>
+</div>
 
-  <div class="form-group">
-    <label for="entrance_fees">Entrance Fees</label>
-    <input type="text" id="entrance_fees" name="entrance_fees" placeholder="e.g. Free, LKR 500, USD 10" value="<?= isset($place['entrance_fees']) ? escape($place['entrance_fees']) : ''; ?>">
-  </div>
+<div class="form-group">
+  <label for="entrance_fees">Entrance Fees</label>
+  <input type="text" id="entrance_fees" name="entrance_fees" placeholder="e.g. Free, LKR 500, USD 10" value="<?= isset($place['entrance_fees']) ? escape($place['entrance_fees']) : ''; ?>">
 </div>
 
 <div class="form-group">

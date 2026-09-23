@@ -67,7 +67,7 @@ mysqli_stmt_close($img_stmt);
         <div class="premium-gallery">
           <?php foreach($images as $index => $img): ?>
             <div class="gallery-item" onclick="openLightbox(<?= $index ?>)">
-              <img src="<?= escape($img); ?>" alt="<?= escape($place['name']); ?>">
+              <img src="<?= escape($img); ?>" alt="<?= escape($place['name']); ?> - Image <?= $index + 1; ?>">
             </div>
           <?php endforeach; ?>
         </div>
@@ -89,8 +89,8 @@ mysqli_stmt_close($img_stmt);
 
         <div class="info-block meta-info-grid">
           <div>
-            <h3><i class="fa-solid fa-location-dot"></i> Distance</h3>
-            <p><strong><?= number_format($place['distance'], 1); ?> km</strong> from Mawanella</p>
+            <h3><i class="fa-solid fa-location-dot"></i> Distance & Time</h3>
+            <p><strong><?= number_format($place['distance'], 1); ?> km</strong> (approx. <?= !empty($place['travel_time']) ? escape($place['travel_time']) : 'N/A'; ?> travel)</p>
           </div>
           <div>
             <h3><i class="fa-regular fa-clock"></i> Opening Hours</h3>
@@ -106,10 +106,24 @@ mysqli_stmt_close($img_stmt);
           </div>
         </div>
 
+        <?php if (!empty($place['travel_routes'])): ?>
+          <div class="info-block">
+            <h3><i class="fa-solid fa-route"></i> Travel Routes</h3>
+            <p><?= escape($place['travel_routes']); ?></p>
+          </div>
+        <?php endif; ?>
+
         <?php if (!empty($place['travel_tips'])): ?>
           <div class="info-block travel-tips-block">
             <h3 class="travel-tips-title"><i class="fa-solid fa-lightbulb"></i> Travel & Safety Tips</h3>
             <p class="travel-tips-text"><?= escape($place['travel_tips']); ?></p>
+          </div>
+        <?php endif; ?>
+
+        <?php if (!empty($place['local_cuisine'])): ?>
+          <div class="info-block">
+            <h3><i class="fa-solid fa-utensils"></i> Local Cuisine</h3>
+            <p><?= escape($place['local_cuisine']); ?></p>
           </div>
         <?php endif; ?>
 

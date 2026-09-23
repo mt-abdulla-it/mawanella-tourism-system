@@ -44,138 +44,144 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (isset($_POST['update_place'])) {
         if (!isset($_POST['csrf_token']) || !verify_csrf($_POST['csrf_token'])) {
             $error = "CSRF verification failed.";
-    } else {
-        $name = trim($_POST['name']);
-        $catId = intval($_POST['category_id']);
-        $desc = trim($_POST['description']);
-        $hours = trim($_POST['opening_hours']);
-        $tips = trim($_POST['travel_tips']);
-        $dist = floatval($_POST['distance']);
-        $estTime = trim($_POST['estimated_time']);
-        $lat = !empty($_POST['latitude']) ? floatval($_POST['latitude']) : null;
-        $lng = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
-        $facil = trim($_POST['facilities']);
-        $fees = trim($_POST['entrance_fees']);
-
-        if (empty($name) || $catId <= 0 || empty($desc) || $dist <= 0) {
-            $error = "Please fill in all required fields.";
         } else {
-            // handle image deletions
-            if (isset($_POST['delete_images']) && is_array($_POST['delete_images'])) {
-                foreach ($_POST['delete_images'] as $del_id) {
-                    $del_id = intval($del_id);
-                    $del_stmt = mysqli_prepare($conn, "SELECT image_path FROM place_images WHERE image_id = ? AND place_id = ?");
-                    mysqli_stmt_bind_param($del_stmt, "ii", $del_id, $id);
-                    mysqli_stmt_execute($del_stmt);
-                    $del_res = mysqli_stmt_get_result($del_stmt);
-                    if ($del_row = mysqli_fetch_assoc($del_res)) {
-                        if (file_exists(__DIR__ . '/../' . $del_row['image_path'])) {
-                            unlink(__DIR__ . '/../' . $del_row['image_path']);
+            $name = trim($_POST['name']);
+            $catId = intval($_POST['category_id']);
+            $desc = trim($_POST['description']);
+            $hours = trim($_POST['opening_hours']);
+            $tips = trim($_POST['travel_tips']);
+            $cuisine = trim($_POST['local_cuisine']);
+            $routes = trim($_POST['travel_routes']);
+            $travelTime = trim($_POST['travel_time']);
+            $dist = floatval($_POST['distance']);
+            $estTime = trim($_POST['estimated_time']);
+            $lat = !empty($_POST['latitude']) ? floatval($_POST['latitude']) : null;
+            $lng = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
+            $facil = trim($_POST['facilities']);
+            $fees = trim($_POST['entrance_fees']);
+
+            if (empty($name) || $catId <= 0 || empty($desc) || $dist <= 0) {
+                $error = "Please fill in all required fields.";
+            } else {
+                // handle image deletions
+                if (isset($_POST['delete_images']) && is_array($_POST['delete_images'])) {
+                    foreach ($_POST['delete_images'] as $del_id) {
+                        $del_id = intval($del_id);
+                        $del_stmt = mysqli_prepare($conn, "SELECT image_path FROM place_images WHERE image_id = ? AND place_id = ?");
+                        mysqli_stmt_bind_param($del_stmt, "ii", $del_id, $id);
+                        mysqli_stmt_execute($del_stmt);
+                        $del_res = mysqli_stmt_get_result($del_stmt);
+                        if ($del_row = mysqli_fetch_assoc($del_res)) {
+                            if (file_exists(__DIR__ . '/../' . $del_row['image_path'])) {
+                                unlink(__DIR__ . '/../' . $del_row['image_path']);
+                            }
+                            $del_do = mysqli_prepare($conn, "DELETE FROM place_images WHERE image_id = ?");
+                            mysqli_stmt_bind_param($del_do, "i", $del_id);
+                            mysqli_stmt_execute($del_do);
+                            mysqli_stmt_close($del_do);
                         }
-                        $del_do = mysqli_prepare($conn, "DELETE FROM place_images WHERE image_id = ?");
-                        mysqli_stmt_bind_param($del_do, "i", $del_id);
-                        mysqli_stmt_execute($del_do);
-                        mysqli_stmt_close($del_do);
-                    }
-                    mysqli_stmt_close($del_stmt);
-                }
-            }
-
-            // update primary image if set
-            if (isset($_POST['primary_image'])) {
-                $primary_id = intval($_POST['primary_image']);
-                $reset_stmt = mysqli_prepare($conn, "UPDATE place_images SET is_primary = 0 WHERE place_id = ?");
-                mysqli_stmt_bind_param($reset_stmt, "i", $id);
-                mysqli_stmt_execute($reset_stmt);
-                mysqli_stmt_close($reset_stmt);
-                
-                $set_stmt = mysqli_prepare($conn, "UPDATE place_images SET is_primary = 1 WHERE image_id = ? AND place_id = ?");
-                mysqli_stmt_bind_param($set_stmt, "ii", $primary_id, $id);
-                mysqli_stmt_execute($set_stmt);
-                mysqli_stmt_close($set_stmt);
-            }
-
-            // Count existing and uploaded
-            $count_stmt = mysqli_prepare($conn, "SELECT COUNT(*) as c FROM place_images WHERE place_id = ?");
-            mysqli_stmt_bind_param($count_stmt, "i", $id);
-            mysqli_stmt_execute($count_stmt);
-            $count_res = mysqli_stmt_get_result($count_stmt);
-            $curr_count = mysqli_fetch_assoc($count_res)['c'];
-            mysqli_stmt_close($count_stmt);
-
-            $total_uploaded = 0;
-            $upload_error = '';
-            if (isset($_FILES['images']) && is_array($_FILES['images']['name']) && $_FILES['images']['error'][0] !== UPLOAD_ERR_NO_FILE) {
-                foreach($_FILES['images']['error'] as $err) {
-                    if ($err === UPLOAD_ERR_OK) {
-                        $total_uploaded++;
-                    } elseif ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
-                        $upload_error = "Error: One or more images exceed the maximum file size limit (2MB).";
+                        mysqli_stmt_close($del_stmt);
                     }
                 }
-            }
 
-            if (!empty($upload_error)) {
-                $error = $upload_error;
-            } elseif (($curr_count + $total_uploaded) > 10) {
-                $error = "Error: You can only have up to 10 images. Please remove some images or select fewer files.";
-            }
+                // update primary image if set
+                if (isset($_POST['primary_image'])) {
+                    $primary_id = intval($_POST['primary_image']);
+                    $reset_stmt = mysqli_prepare($conn, "UPDATE place_images SET is_primary = 0 WHERE place_id = ?");
+                    mysqli_stmt_bind_param($reset_stmt, "i", $id);
+                    mysqli_stmt_execute($reset_stmt);
+                    mysqli_stmt_close($reset_stmt);
+                    
+                    $set_stmt = mysqli_prepare($conn, "UPDATE place_images SET is_primary = 1 WHERE image_id = ? AND place_id = ?");
+                    mysqli_stmt_bind_param($set_stmt, "ii", $primary_id, $id);
+                    mysqli_stmt_execute($set_stmt);
+                    mysqli_stmt_close($set_stmt);
+                }
 
-            if (empty($error)) {
-                // handle new image uploads
-                if ($total_uploaded > 0) {
-                    $total_files = count($_FILES['images']['name']);
-                    for ($i = 0; $i < $total_files; $i++) {
-                        if ($curr_count >= 10) break;
+                // Count existing and uploaded
+                $count_stmt = mysqli_prepare($conn, "SELECT COUNT(*) as c FROM place_images WHERE place_id = ?");
+                mysqli_stmt_bind_param($count_stmt, "i", $id);
+                mysqli_stmt_execute($count_stmt);
+                $count_res = mysqli_stmt_get_result($count_stmt);
+                $curr_count = mysqli_fetch_assoc($count_res)['c'];
+                mysqli_stmt_close($count_stmt);
 
-                        if ($_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
-                            $tmpName = $_FILES['images']['tmp_name'][$i];
-                            $fileName = basename($_FILES['images']['name'][$i]);
-                            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-                            $allowed = ['jpg', 'jpeg', 'png', 'webp'];
-                            
-                            if (in_array($ext, $allowed)) {
-                                $newName = uniqid() . '_' . $i . '.' . $ext;
-                                $dest = __DIR__ . '/../assets/images/places/' . $newName;
-                                if (move_uploaded_file($tmpName, $dest)) {
-                                    $img_path = 'assets/images/places/' . $newName;
-                                    $is_prim = ($curr_count === 0 && $i === 0) ? 1 : 0;
-                                    $img_stmt = mysqli_prepare($conn, "INSERT INTO place_images (place_id, image_path, is_primary) VALUES (?, ?, ?)");
-                                    mysqli_stmt_bind_param($img_stmt, "isi", $id, $img_path, $is_prim);
-                                    mysqli_stmt_execute($img_stmt);
-                                    mysqli_stmt_close($img_stmt);
-                                    $curr_count++;
+                $total_uploaded = 0;
+                $upload_error = '';
+                if (isset($_FILES['images']) && is_array($_FILES['images']['name']) && $_FILES['images']['error'][0] !== UPLOAD_ERR_NO_FILE) {
+                    foreach($_FILES['images']['error'] as $err) {
+                        if ($err === UPLOAD_ERR_OK) {
+                            $total_uploaded++;
+                        } elseif ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
+                            $upload_error = "Error: One or more images exceed the maximum file size limit (2MB).";
+                        }
+                    }
+                }
+
+                if (!empty($upload_error)) {
+                    $error = $upload_error;
+                } elseif (($curr_count + $total_uploaded) > 10) {
+                    $error = "Error: You can only have up to 10 images. Please remove some images or select fewer files.";
+                }
+
+                if (empty($error)) {
+                    // handle new image uploads
+                    if ($total_uploaded > 0) {
+                        $total_files = count($_FILES['images']['name']);
+                        for ($i = 0; $i < $total_files; $i++) {
+                            if ($curr_count >= 10) break;
+
+                            if ($_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
+                                $tmpName = $_FILES['images']['tmp_name'][$i];
+                                $fileName = basename($_FILES['images']['name'][$i]);
+                                $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                                $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+                                
+                                if (in_array($ext, $allowed)) {
+                                    $newName = uniqid() . '_' . $i . '.' . $ext;
+                                    $dest = __DIR__ . '/../assets/images/places/' . $newName;
+                                    if (move_uploaded_file($tmpName, $dest)) {
+                                        $img_path = 'assets/images/places/' . $newName;
+                                        $is_prim = ($curr_count === 0 && $i === 0) ? 1 : 0;
+                                        $img_stmt = mysqli_prepare($conn, "INSERT INTO place_images (place_id, image_path, is_primary) VALUES (?, ?, ?)");
+                                        mysqli_stmt_bind_param($img_stmt, "isi", $id, $img_path, $is_prim);
+                                        mysqli_stmt_execute($img_stmt);
+                                        mysqli_stmt_close($img_stmt);
+                                        $curr_count++;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                $update_stmt = mysqli_prepare($conn, "UPDATE places SET 
-                                                      name = ?, 
-                                                      category_id = ?, 
-                                                      description = ?, 
-                                                      opening_hours = ?, 
-                                                      travel_tips = ?, 
-                                                      distance = ?, 
-                                                      estimated_time = ?, 
-                                                      latitude = ?, 
-                                                      longitude = ?, 
-                                                      facilities = ?,
-                                                      entrance_fees = ?
-                                                      WHERE place_id = ?");
-                
-                mysqli_stmt_bind_param($update_stmt, "sisssdsddssi", 
-                    $name, $catId, $desc, $hours, $tips, $dist, $estTime, $lat, $lng, $facil, $fees, $id
-                );
+                    $update_stmt = mysqli_prepare($conn, "UPDATE places SET 
+                                                          name = ?, 
+                                                          category_id = ?, 
+                                                          description = ?, 
+                                                          opening_hours = ?, 
+                                                          travel_tips = ?, 
+                                                          local_cuisine = ?, 
+                                                          travel_routes = ?, 
+                                                          travel_time = ?, 
+                                                          distance = ?, 
+                                                          estimated_time = ?, 
+                                                          latitude = ?, 
+                                                          longitude = ?, 
+                                                          facilities = ?,
+                                                          entrance_fees = ?
+                                                          WHERE place_id = ?");
+                    
+                    mysqli_stmt_bind_param($update_stmt, "sissssssdsddssi", 
+                        $name, $catId, $desc, $hours, $tips, $cuisine, $routes, $travelTime, $dist, $estTime, $lat, $lng, $facil, $fees, $id
+                    );
 
-                if (mysqli_stmt_execute($update_stmt)) {
-                    mysqli_stmt_close($update_stmt);
-                    redirect("dashboard.php?msg=updated");
-                } else {
-                    $error = "Error updating place: " . mysqli_error($conn);
+                    if (mysqli_stmt_execute($update_stmt)) {
+                        mysqli_stmt_close($update_stmt);
+                        redirect("dashboard.php?msg=updated");
+                    } else {
+                        $error = "Error updating place: " . mysqli_error($conn);
+                    }
                 }
-            }
             }
         }
     }

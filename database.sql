@@ -31,6 +31,9 @@ CREATE TABLE `places` (
   `description` TEXT NOT NULL,
   `opening_hours` VARCHAR(255) DEFAULT '8:00 AM - 5:00 PM',
   `travel_tips` TEXT,
+  `local_cuisine` TEXT,
+  `travel_routes` TEXT,
+  `travel_time` VARCHAR(50) DEFAULT '30 mins',
   `distance` DECIMAL(10,2) NOT NULL,
   `estimated_time` VARCHAR(50) DEFAULT '1-2 hours',
   `latitude` DECIMAL(10,8) DEFAULT NULL,
@@ -41,26 +44,26 @@ CREATE TABLE `places` (
   FOREIGN KEY (`category_id`) REFERENCES `categories`(`category_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `places` (`place_id`, `name`, `category_id`, `description`, `opening_hours`, `travel_tips`, `distance`, `estimated_time`, `latitude`, `longitude`, `facilities`, `entrance_fees`) VALUES
-(1, 'Uthuwankanda Saradiel Village', 1, 'Theme village setup about Saradiel hero with statues and history details about old Mawanella area.', '8:30 AM - 5:30 PM', 'Wear comfortable walking shoes. Good to get local guide for history details.', 5.70, '2 - 3 hours', 7.25150000, 80.44910000, 'Parking, Restrooms, Local Food Stall, Guided Tours', 'LKR 500'),
+INSERT INTO `places` (`place_id`, `name`, `category_id`, `description`, `opening_hours`, `travel_tips`, `local_cuisine`, `travel_routes`, `travel_time`, `distance`, `estimated_time`, `latitude`, `longitude`, `facilities`, `entrance_fees`) VALUES
+(1, 'Uthuwankanda Saradiel Village', 1, 'Theme village setup about Saradiel hero with statues and history details about old Mawanella area.', '8:30 AM - 5:30 PM', 'Wear comfortable walking shoes. Good to get local guide for history details.', 'Try the traditional village rice and curry served on banana leaves.', 'Take the Colombo-Kandy road from Mawanella and turn left at Uthuwankanda junction.', '15 mins', 5.70, '2 - 3 hours', 7.25150000, 80.44910000, 'Parking, Restrooms, Local Food Stall, Guided Tours', 'LKR 500'),
 
-(2, 'Bo Ella Waterfall', 2, 'Small hidden waterfall in Uthuwankanda area with peaceful rocks and trees. Good spot for relaxing and pictures.', '6:00 AM - 6:00 PM', 'Path can get slippery when raining. Be careful near rocks.', 5.80, '1 - 2 hours', 7.24310000, 80.46120000, 'Parking nearby, Viewing Spot'),
+(2, 'Bo Ella Waterfall', 2, 'Small hidden waterfall in Uthuwankanda area with peaceful rocks and trees. Good spot for relaxing and pictures.', '6:00 AM - 6:00 PM', 'Path can get slippery when raining. Be careful near rocks.', 'Local tea and pol roti available at small shops nearby.', 'Head towards Uthuwankanda and follow the rural roads leading to the falls.', '15 mins', 5.80, '1 - 2 hours', 7.24310000, 80.46120000, 'Parking nearby, Viewing Spot'),
 
-(3, 'Mawela Walagamba Cave Temple', 3, 'Old cave temple linked to King Walagamba period with rock paintings and peaceful temple surrounding.', '6:00 AM - 7:00 PM', 'Dress properly covering shoulders and knees when visiting shrine.', 5.90, '1 hour', 7.23890000, 80.43850000, 'Restrooms, Shoe Keeping Place'),
+(3, 'Mawela Walagamba Cave Temple', 3, 'Old cave temple linked to King Walagamba period with rock paintings and peaceful temple surrounding.', '6:00 AM - 7:00 PM', 'Dress properly covering shoulders and knees when visiting shrine.', 'Purchase sweetmeats like Kavum and Kokis from nearby vendors.', 'Take the Rambukkana road from Mawanella town and turn at Mawela.', '20 mins', 5.90, '1 hour', 7.23890000, 80.43850000, 'Restrooms, Shoe Keeping Place'),
 
-(4, 'Kadugannawa Tunnel', 4, 'Famous rock tunnel made during British time along Colombo Kandy main road.', 'Open 24 Hours', 'Park vehicle safely on side bay before taking photos.', 7.20, '30 mins', 7.25540000, 80.52210000, 'Parking, Small Shops'),
+(4, 'Kadugannawa Tunnel', 4, 'Famous rock tunnel made during British time along Colombo Kandy main road.', 'Open 24 Hours', 'Park vehicle safely on side bay before taking photos.', 'Great spot to grab king coconut or roasted corn on the cob.', 'Drive directly along the Colombo-Kandy (A1) highway.', '25 mins', 7.20, '30 mins', 7.25540000, 80.52210000, 'Parking, Small Shops'),
 
-(5, 'Kadugannawa Train Station', 4, 'Historic railway station built during British era with nice mountain and tea estate view.', '5:00 AM - 9:00 PM', 'Good place for rail photos. Do not walk on live train lines.', 8.70, '45 mins', 7.25410000, 80.52840000, 'Ticket Counter, Waiting Area, Restrooms, Parking'),
+(5, 'Kadugannawa Train Station', 4, 'Historic railway station built during British era with nice mountain and tea estate view.', '5:00 AM - 9:00 PM', 'Good place for rail photos. Do not walk on live train lines.', 'Wade and milk tea from the station canteen.', 'Drive up the Kadugannawa pass on A1 and turn right into the station road.', '30 mins', 8.70, '45 mins', 7.25410000, 80.52840000, 'Ticket Counter, Waiting Area, Restrooms, Parking'),
 
-(6, 'Meeyan Ella Waterfall', 6, 'Waterfall near old railway line. Popular place for trekking and nature photography.', '7:00 AM - 5:30 PM', 'Trek path near railway line needs extra care. Go early morning.', 9.90, '2 hours', 7.26110000, 80.51420000, 'Walking Trail, Viewpoint'),
+(6, 'Meeyan Ella Waterfall', 6, 'Waterfall near old railway line. Popular place for trekking and nature photography.', '7:00 AM - 5:30 PM', 'Trek path near railway line needs extra care. Go early morning.', 'Bring your own snacks and water as shops are limited.', 'Drive towards Ihalakotte via Rambukkana road and trek along the railway line.', '40 mins', 9.90, '2 hours', 7.26110000, 80.51420000, 'Walking Trail, Viewpoint'),
 
-(7, 'Pinnawala Zoo', 7, 'Open layout zoo near Pinnawala featuring native animals and birds of Sri Lanka.', '8:30 AM - 5:30 PM', 'Can visit both zoo and elephant orphanage on same day.', 16.00, '2 - 3 hours', 7.30210000, 80.38720000, 'Parking, Restaurants, Souvenir Shop, Restrooms', 'LKR 2000'),
+(7, 'Pinnawala Zoo', 7, 'Open layout zoo near Pinnawala featuring native animals and birds of Sri Lanka.', '8:30 AM - 5:30 PM', 'Can visit both zoo and elephant orphanage on same day.', 'Various food options inside including local rice meals and snacks.', 'Take the Rambukkana road from Mawanella, straight to Pinnawala.', '35 mins', 16.00, '2 - 3 hours', 7.30210000, 80.38720000, 'Parking, Restaurants, Souvenir Shop, Restrooms', 'LKR 2000'),
 
-(8, 'Pinnawala Elephant Orphanage', 7, 'Famous elephant center where you can watch elephants bathing in river and feeding.', '8:30 AM - 5:30 PM', 'River bath times are 10:00 AM and 2:00 PM. Go early to get good place.', 17.00, '3 - 4 hours', 7.30110000, 80.38610000, 'Cafeteria, Restrooms, Parking, Shops', 'LKR 3000'),
+(8, 'Pinnawala Elephant Orphanage', 7, 'Famous elephant center where you can watch elephants bathing in river and feeding.', '8:30 AM - 5:30 PM', 'River bath times are 10:00 AM and 2:00 PM. Go early to get good place.', 'Enjoy local buffet lunches at the restaurants overlooking the river.', 'Located on Rambukkana road, right opposite the Pinnawala Zoo.', '35 mins', 17.00, '3 - 4 hours', 7.30110000, 80.38610000, 'Cafeteria, Restrooms, Parking, Shops', 'LKR 3000'),
 
-(9, 'Asupini Ella Waterfall', 6, 'Large waterfall near Aranayaka side with high views and scenic countryside walk.', '7:00 AM - 5:00 PM', 'Need to trek down path. Take water bottle and wear good shoes.', 18.00, '2 - 3 hours', 7.18950000, 80.47980000, 'Viewing Deck, Local Snacks'),
+(9, 'Asupini Ella Waterfall', 6, 'Large waterfall near Aranayaka side with high views and scenic countryside walk.', '7:00 AM - 5:00 PM', 'Need to trek down path. Take water bottle and wear good shoes.', 'Small village shops offer local sweets and hot tea.', 'Take the Aranayaka road from Mawanella and follow signs to the falls.', '45 mins', 18.00, '2 - 3 hours', 7.18950000, 80.47980000, 'Viewing Deck, Local Snacks'),
 
-(10, 'Ambuluwawa Biodiversity Complex', 2, 'Multi-religious tower built on top of hill with 360 degree panoramic view of central hills.', '7:30 AM - 6:00 PM', 'Tower steps get narrow at top, take care if afraid of heights.', 24.80, '3 - 4 hours', 7.16810000, 80.54890000, 'Parking, Snack Bar, Restrooms, Tower View');
+(10, 'Ambuluwawa Biodiversity Complex', 2, 'Multi-religious tower built on top of hill with 360 degree panoramic view of central hills.', '7:30 AM - 6:00 PM', 'Tower steps get narrow at top, take care if afraid of heights.', 'Snack bar at the entrance offers rolls, patties, and soft drinks.', 'Drive towards Gampola and take the steep road up to Ambuluwawa peak.', '55 mins', 24.80, '3 - 4 hours', 7.16810000, 80.54890000, 'Parking, Snack Bar, Restrooms, Tower View');
 
 CREATE TABLE `place_images` (
   `image_id` INT AUTO_INCREMENT PRIMARY KEY,
