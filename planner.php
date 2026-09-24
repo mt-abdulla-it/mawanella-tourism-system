@@ -50,6 +50,7 @@ require_once 'includes/header.php';
 
 $planList = [];
 $totalKm = 0.00;
+$totalMinutes = 0;
 
 if (!empty($_SESSION['day_plan'])) {
     $placeIds = array_map('intval', $_SESSION['day_plan']);
@@ -70,9 +71,37 @@ if (!empty($_SESSION['day_plan'])) {
     while ($row = mysqli_fetch_assoc($res)) {
         $planList[] = $row;
         $totalKm += $row['distance'];
+        
+        // Calculate estimated time
+        $est = strtolower($row['estimated_time']);
+        preg_match_all('/\d+/', $est, $matches);
+        $nums = $matches[0];
+        if (count($nums) > 0) {
+            $sum = array_sum($nums);
+            $avg = $sum / count($nums);
+            if (strpos($est, 'min') !== false) {
+                $totalMinutes += $avg;
+            } else {
+                $totalMinutes += $avg * 60;
+            }
+        }
     }
     mysqli_stmt_close($stmt);
 }
+
+// Format total duration string
+$totalHours = floor($totalMinutes / 60);
+$remainingMins = round($totalMinutes % 60);
+$durationStr = "0 mins";
+
+if ($totalHours > 0 && $remainingMins > 0) {
+    $durationStr = $totalHours . " hr" . ($totalHours > 1 ? "s" : "") . " " . $remainingMins . " min" . ($remainingMins > 1 ? "s" : "");
+} elseif ($totalHours > 0) {
+    $durationStr = $totalHours . " hr" . ($totalHours > 1 ? "s" : "");
+} elseif ($remainingMins > 0) {
+    $durationStr = $remainingMins . " min" . ($remainingMins > 1 ? "s" : "");
+}
+
 ?>
 
 <div class="container planner-page-container">
@@ -104,7 +133,7 @@ if (!empty($_SESSION['day_plan'])) {
         <p>Total Distance</p>
       </div>
       <div class="summary-item">
-        <h3>Full Day Trip</h3>
+        <h3><?= $durationStr; ?></h3>
         <p>Estimated Duration</p>
       </div>
     </div>
