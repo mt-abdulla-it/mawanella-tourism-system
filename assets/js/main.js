@@ -16,6 +16,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // 1b. Mobile Hamburger Toggle
+  const menuToggle = document.getElementById('menu-toggle');
+  const navLinks = document.getElementById('nav-links');
+  if (menuToggle && navLinks) {
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+      menuToggle.classList.toggle('active');
+    });
+
+    // close menu when a link is clicked
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        menuToggle.classList.remove('active');
+      });
+    });
+  }
+
   // 2. Dark Mode Toggle
   const themeToggle = document.getElementById('theme-toggle');
   const currentTheme = localStorage.getItem('theme');
@@ -40,6 +58,27 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // 3. Scroll Reveal Animations (Intersection Observer)
+  const revealOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
+  };
+  
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        revealObserver.unobserve(entry.target); // Stop observing once revealed
+      }
+    });
+  }, revealOptions);
+
+  // Observe all elements that have the animate-fade-up class
+  document.querySelectorAll('.animate-fade-up').forEach(el => {
+    revealObserver.observe(el);
+  });
 
   // 3. Scroll to Top Button
   const scrollTopBtn = document.getElementById('scrollTopBtn');
