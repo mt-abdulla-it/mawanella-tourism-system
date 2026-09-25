@@ -1,6 +1,5 @@
 <?php
 require_once 'config/db.php';
-require_once 'includes/header.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -17,6 +16,8 @@ mysqli_stmt_execute($stmt);
 $res = mysqli_stmt_get_result($stmt);
 
 if (!$res || mysqli_num_rows($res) === 0) {
+    $page_title = 'Place Not Found';
+    require_once 'includes/header.php';
     echo "<div class='container' style='padding:50px 0;'><h2>Place not found.</h2><a href='index.php' class='btn btn-primary'>Back to List</a></div>";
     require_once 'includes/footer.php';
     exit();
@@ -24,6 +25,10 @@ if (!$res || mysqli_num_rows($res) === 0) {
 
 $place = mysqli_fetch_assoc($res);
 mysqli_stmt_close($stmt);
+
+// set dynamic page title
+$page_title = $place['name'];
+require_once 'includes/header.php';
 
 // fetch images
 $images = [];
@@ -67,14 +72,14 @@ mysqli_stmt_close($img_stmt);
         <div class="premium-gallery">
           <?php foreach($images as $index => $img): ?>
             <div class="gallery-item" onclick="openLightbox(<?= $index ?>)">
-              <img src="<?= escape($img); ?>" alt="<?= escape($place['name']); ?> - Image <?= $index + 1; ?>">
+            <img src="<?= escape($img); ?>" alt="<?= escape($place['name']); ?> - Image <?= $index + 1; ?>" loading="lazy">
             </div>
           <?php endforeach; ?>
         </div>
       <?php else: ?>
         <div class="premium-gallery">
           <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80" alt="Default Image">
+            <img src="https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80" alt="Default Image" loading="lazy">
           </div>
         </div>
       <?php endif; ?>
@@ -130,7 +135,46 @@ mysqli_stmt_close($img_stmt);
         <?php if (!empty($place['facilities'])): ?>
           <div class="info-block">
             <h3><i class="fa-solid fa-concierge-bell"></i> Facilities</h3>
-            <p><?= escape($place['facilities']); ?></p>
+            <div class="facility-tags">
+              <?php 
+                $facilityList = array_map('trim', explode(',', $place['facilities']));
+                // icon mapping for common facilities
+                $facilityIcons = [
+                  'parking' => 'fa-square-parking',
+                  'restroom' => 'fa-restroom',
+                  'restrooms' => 'fa-restroom',
+                  'food' => 'fa-utensils',
+                  'restaurant' => 'fa-utensils',
+                  'restaurants' => 'fa-utensils',
+                  'cafeteria' => 'fa-mug-hot',
+                  'snack' => 'fa-cookie-bite',
+                  'shop' => 'fa-shop',
+                  'shops' => 'fa-shop',
+                  'souvenir' => 'fa-gift',
+                  'guided' => 'fa-person-hiking',
+                  'ticket' => 'fa-ticket',
+                  'walking' => 'fa-person-walking',
+                  'viewpoint' => 'fa-binoculars',
+                  'viewing' => 'fa-binoculars',
+                  'tower' => 'fa-tower-observation',
+                  'waiting' => 'fa-chair',
+                  'shoe' => 'fa-shoe-prints',
+                  'trail' => 'fa-map-signs',
+                  'local' => 'fa-store',
+                ];
+                foreach ($facilityList as $fac):
+                  $facLower = strtolower($fac);
+                  $icon = 'fa-check';
+                  foreach ($facilityIcons as $keyword => $iconClass) {
+                    if (strpos($facLower, $keyword) !== false) {
+                      $icon = $iconClass;
+                      break;
+                    }
+                  }
+              ?>
+                <span class="facility-tag"><i class="fa-solid <?= $icon; ?>"></i> <?= escape($fac); ?></span>
+              <?php endforeach; ?>
+            </div>
           </div>
         <?php endif; ?>
       </div>
@@ -144,9 +188,15 @@ mysqli_stmt_close($img_stmt);
           <div id="map-container" data-lat="<?= escape($place['latitude']); ?>" data-lng="<?= escape($place['longitude']); ?>" data-title="<?= escape($place['name']); ?>">
             <!-- Map renders here -->
           </div>
-          <p class="map-desc">
-            <i class="fa-solid fa-location-arrow"></i> Coordinates: <?= escape($place['latitude']); ?>, <?= escape($place['longitude']); ?>
-          </p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px;">
+            <p class="map-desc" style="margin: 0;">
+              <i class="fa-solid fa-location-arrow"></i> Coordinates: <?= escape($place['latitude']); ?>, <?= escape($place['longitude']); ?>
+            </p>
+            <a href="https://www.google.com/maps/dir/?api=1&origin=Mawanella,+Sri+Lanka&destination=<?= escape($place['latitude']); ?>,<?= escape($place['longitude']); ?>" 
+               target="_blank" class="btn btn-primary" style="padding: 8px 15px; font-size: 0.9rem;">
+               <i class="fa-solid fa-diamond-turn-right"></i> Get Directions From Mawanella
+            </a>
+          </div>
         <?php else: ?>
           <div class="map-placeholder">
             <p><i class="fa-solid fa-map-pin"></i> Map coordinates not available for this location.</p>
@@ -155,6 +205,54 @@ mysqli_stmt_close($img_stmt);
       </div>
     </div>
   </div>
+
+  <!-- Nearby Places Section -->
+  <?php
+  // Fetch 3 nearby places based on similar distance from Mawanella
+  // (A simple proxy for 'nearby' since we don't have Haversine enabled by default, 
+  // but using a basic +/- 5km distance diff as a simple approximation)
+  $currentDist = floatval($place['distance']);
+  $nearby_stmt = mysqli_prepare($conn, "SELECT p.*, c.category_name,
+                                        (SELECT image_path FROM place_images WHERE place_id = p.place_id ORDER BY is_primary DESC, image_id ASC LIMIT 1) as primary_image
+                                        FROM places p 
+                                        JOIN categories c ON p.category_id = c.category_id 
+                                        WHERE p.place_id != ? 
+                                        AND ABS(p.distance - ?) < 10
+                                        ORDER BY ABS(p.distance - ?) ASC
+                                        LIMIT 3");
+  mysqli_stmt_bind_param($nearby_stmt, "idd", $id, $currentDist, $currentDist);
+  mysqli_stmt_execute($nearby_stmt);
+  $nearbyRes = mysqli_stmt_get_result($nearby_stmt);
+
+  if (mysqli_num_rows($nearbyRes) > 0):
+  ?>
+  <div class="nearby-places-section animate-fade-up delay-400" style="margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border-color);">
+    <h2 style="color: var(--primary-color); margin-bottom: 20px; font-size: 1.5rem;"><i class="fa-solid fa-map-location"></i> Explore Nearby Places</h2>
+    <div class="places-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+      <?php while ($nPlace = mysqli_fetch_assoc($nearbyRes)): ?>
+        <?php 
+            $imgSrc = (!empty($nPlace['primary_image']) && file_exists($nPlace['primary_image'])) 
+                      ? escape($nPlace['primary_image']) 
+                      : "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=500&q=80";
+        ?>
+        <article class="card">
+          <div class="card-header" style="height: 150px;">
+            <img src="<?= $imgSrc; ?>" alt="<?= escape($nPlace['name']); ?>" loading="lazy">
+            <span class="category-badge" style="font-size: 0.7rem;"><?= escape($nPlace['category_name']); ?></span>
+          </div>
+          <div class="card-body" style="padding: 15px;">
+            <h3 class="card-title" style="font-size: 1.1rem; margin-bottom: 5px;"><?= escape($nPlace['name']); ?></h3>
+            <div class="meta-info" style="font-size: 0.8rem; margin-bottom: 10px;">
+              <span><i class="fa-solid fa-location-dot"></i> <?= number_format($nPlace['distance'], 1); ?> km from Mawanella</span>
+            </div>
+            <a href="details.php?id=<?= $nPlace['place_id']; ?>" class="btn btn-outline btn-full-width" style="padding: 8px; font-size: 0.9rem;">View Details</a>
+          </div>
+        </article>
+      <?php endwhile; ?>
+    </div>
+  </div>
+  <?php endif; ?>
+  <?php mysqli_stmt_close($nearby_stmt); ?>
 
 </div>
 
