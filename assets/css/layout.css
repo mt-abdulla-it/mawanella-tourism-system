@@ -422,3 +422,106 @@ header {
 .hamburger-btn.active .hamburger-line:nth-child(3) {
   transform: rotate(-45deg) translate(5px, -6px);
 }
+
+/* Print Optimization (@media print) */
+@media print {
+  header, 
+  footer, 
+  #preloader, 
+  #scrollTopBtn, 
+  #toast-container,
+  .btn, 
+  .btn-theme-toggle, 
+  .hamburger-btn,
+  .modal-backdrop {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 12pt !important;
+  }
+
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .planner-page-container {
+    padding: 0 !important;
+  }
+
+  .planner-header-wrapper {
+    margin-bottom: 20px !important;
+    border-bottom: 2px solid #000000 !important;
+    padding-bottom: 10px !important;
+  }
+
+  .planner-title {
+    color: #000000 !important;
+    font-size: 22pt !important;
+  }
+
+  .planner-subtitle {
+    color: #333333 !important;
+  }
+
+  .planner-summary {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    background: #f9f9f9 !important;
+    margin-bottom: 20px !important;
+  }
+
+  .planner-summary h3 {
+    color: #000000 !important;
+  }
+
+  .planner-budget-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    background: #f9f9f9 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .planner-budget-card select, 
+  .planner-budget-card input {
+    border: 1px solid #999 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .planner-card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 15px !important;
+  }
+
+  .planner-item-index {
+    background: #333333 !important;
+    color: #ffffff !important;
+  }
+
+  .planner-map-section {
+    border: 1px solid #ccc !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid;
+  }
+
+  #planner-map {
+    height: 350px !important;
+  }
+
+  .animate-fade-up {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}

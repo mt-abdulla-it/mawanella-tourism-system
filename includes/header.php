@@ -53,6 +53,7 @@ $page_title = isset($page_title) ? $page_title . ' | Mawanella Tourism' : 'Mawan
             <i class="fa-solid fa-route"></i> Day Plan 
             <span id="planner-badge" class="planner-badge-count <?= $planner_count > 0 ? 'pulse-anim' : ''; ?>"><?= $planner_count; ?></span>
           </a></li>
+          <li><a href="#" id="openEmergencyModal" style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Emergency</a></li>
           <li><a href="admin/login.php"><i class="fa-solid fa-user-shield"></i> Admin</a></li>
           <li>
             <button id="theme-toggle" class="btn-theme-toggle" title="Toggle Dark Mode">
