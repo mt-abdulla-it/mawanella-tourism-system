@@ -51,10 +51,17 @@ if (isset($_POST['login'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Login - Mawanella Tourism System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="login-bg">
+
+  <button id="theme-toggle" class="btn-theme-toggle" title="Toggle Dark Mode" style="position: absolute; top: 20px; right: 20px;">
+    <i class="fa-solid fa-moon"></i>
+  </button>
 
   <div class="container">
     <div class="form-card" style="max-width: 450px;">
@@ -116,5 +123,6 @@ if (isset($_POST['login'])) {
       });
     }
   </script>
+  <script src="../assets/js/main.js"></script>
 </body>
 </html>
