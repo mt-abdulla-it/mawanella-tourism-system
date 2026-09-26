@@ -3,7 +3,7 @@
 // student: abdulla mt (E2410182)
 
 function escape($str) {
-    return htmlspecialchars(trim($str), ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(trim($str ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
 function redirect($url) {
