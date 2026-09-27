@@ -1,5 +1,7 @@
 <?php
 require_once 'config/db.php';
+
+
 require_once 'includes/header.php';
 
 // Mawanella area has waterfalls, cave temples and wildlife parks
@@ -8,6 +10,7 @@ $catRes = mysqli_query($conn, $catQuery);
 
 // filter and search checks
 $catFilter = isset($_GET['category']) ? intval($_GET['category']) : 0;
+$maxDist = isset($_GET['max_dist']) ? floatval($_GET['max_dist']) : 0;
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 // prepared query for security
@@ -24,6 +27,12 @@ if ($catFilter > 0) {
     $sql .= " AND p.category_id = ?";
     $params[] = $catFilter;
     $types .= "i";
+}
+
+if ($maxDist > 0) {
+    $sql .= " AND p.distance <= ?";
+    $params[] = $maxDist;
+    $types .= "d";
 }
 
 if (!empty($search)) {
@@ -72,12 +81,12 @@ $placesRes = mysqli_stmt_get_result($stmt);
     <div class="flex-between" style="align-items: center; flex-wrap: wrap; gap: 15px;">
       <div class="weather-info">
         <h3 style="color: var(--primary-color); font-size: 1.2rem; margin-bottom: 8px;"><i class="fa-solid fa-location-dot"></i> Live Mawanella Weather</h3>
-        <p id="weatherDesc" style="color: var(--text-color); font-size: 1rem; display: flex; align-items: center; gap: 10px; margin:0;">
+        <p id="weatherDesc" style="color: var(--text-main); font-size: 1rem; display: flex; align-items: center; gap: 10px; margin:0;">
           <i class="fa-solid fa-spinner fa-spin"></i> Loading forecast...
         </p>
       </div>
       <div class="weather-temp">
-        <h2 id="weatherTemp" style="font-size: 2.8rem; font-weight: 800; color: var(--text-color); margin:0;">--°C</h2>
+        <h2 id="weatherTemp" style="font-size: 2.8rem; font-weight: 800; color: var(--text-main); margin:0;">--°C</h2>
       </div>
     </div>
   </section>
@@ -108,20 +117,48 @@ $placesRes = mysqli_stmt_get_result($stmt);
            }
         })
         .catch(err => {
+           document.getElementById('weatherTemp').innerHTML = 'N/A';
            document.getElementById('weatherDesc').innerHTML = '<i class="fa-solid fa-cloud-xmark"></i> Forecast unavailable right now.';
         });
     });
   </script>
 
-  <!-- Category Filter Section -->
+  <!-- Distance & Category Filter Section -->
   <section class="filter-section animate-fade-up delay-200">
+    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+      <div class="filter-title"><i class="fa-solid fa-route"></i> Max Distance:</div>
+      <div class="category-tabs">
+        <?php 
+          $baseParams = [];
+          if ($catFilter > 0) $baseParams['category'] = $catFilter;
+          if (!empty($search)) $baseParams['search'] = $search;
+          $makeUrl = function($dist) use ($baseParams) {
+              $p = $baseParams;
+              if ($dist > 0) $p['max_dist'] = $dist;
+              return 'index.php' . (!empty($p) ? '?' . http_build_query($p) : '');
+          };
+        ?>
+        <a href="<?= $makeUrl(0); ?>" class="tab-btn <?= $maxDist == 0 ? 'active' : ''; ?>">All Distance (<=25km)</a>
+        <a href="<?= $makeUrl(10); ?>" class="tab-btn <?= $maxDist == 10 ? 'active' : ''; ?>">< 10 km (Nearby)</a>
+        <a href="<?= $makeUrl(20); ?>" class="tab-btn <?= $maxDist == 20 ? 'active' : ''; ?>">< 20 km (Medium)</a>
+      </div>
+    </div>
+
     <div class="filter-title"><i class="fa-solid fa-filter"></i> Filter by Category:</div>
     <div class="category-tabs">
-      <a href="index.php<?= !empty($search) ? '?search=' . urlencode($search) : ''; ?>" 
-         class="tab-btn <?= $catFilter == 0 ? 'active' : ''; ?>">All Attractions</a>
+      <?php 
+        $makeCatUrl = function($catId) use ($maxDist, $search) {
+            $p = [];
+            if ($catId > 0) $p['category'] = $catId;
+            if ($maxDist > 0) $p['max_dist'] = $maxDist;
+            if (!empty($search)) $p['search'] = $search;
+            return 'index.php' . (!empty($p) ? '?' . http_build_query($p) : '');
+        };
+      ?>
+      <a href="<?= $makeCatUrl(0); ?>" class="tab-btn <?= $catFilter == 0 ? 'active' : ''; ?>">All Categories</a>
       
       <?php while ($cat = mysqli_fetch_assoc($catRes)): ?>
-        <a href="index.php?category=<?= $cat['category_id']; ?><?= !empty($search) ? '&search=' . urlencode($search) : ''; ?>" 
+        <a href="<?= $makeCatUrl($cat['category_id']); ?>" 
            class="tab-btn <?= $catFilter == $cat['category_id'] ? 'active' : ''; ?>">
            <?= escape($cat['category_name']); ?>
         </a>
@@ -137,12 +174,38 @@ $placesRes = mysqli_stmt_get_result($stmt);
             $imgSrc = (!empty($place['primary_image']) && file_exists($place['primary_image'])) 
                       ? escape($place['primary_image']) 
                       : "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=500&q=80";
+
+            // Determine best visit time badge
+            $safeText = strtolower($place['safe_visit_time'] ?? '');
+            $catName = strtolower($place['category_name'] ?? '');
+            $placeName = strtolower($place['name'] ?? '');
+
+            $badgeText = "Day Visit";
+            $badgeIcon = "fa-sun";
+            $badgeColor = "#f59e0b";
+
+            if (strpos($catName, 'waterfall') !== false || strpos($placeName, 'waterfall') !== false || strpos($placeName, 'ella') !== false) {
+              $badgeText = "Rain Caution";
+              $badgeIcon = "fa-cloud-showers-water";
+              $badgeColor = "#ef4444";
+            } elseif (strpos($safeText, 'morning') !== false || strpos($safeText, '8:00 am') !== false) {
+              $badgeText = "Best: Morning";
+              $badgeIcon = "fa-sun";
+              $badgeColor = "#10b981";
+            } elseif (strpos($safeText, 'evening') !== false || strpos($safeText, '4:00 pm') !== false) {
+              $badgeText = "Best: Afternoon";
+              $badgeIcon = "fa-cloud-sun";
+              $badgeColor = "#6366f1";
+            }
         ?>
         <article class="card animate-fade-up delay-300">
           <div class="card-header">
             <img src="<?= $imgSrc; ?>" alt="<?= escape($place['name']); ?>" loading="lazy">
             <span class="category-badge"><?= escape($place['category_name']); ?></span>
             <span class="distance-badge"><i class="fa-solid fa-location-dot"></i> <?= number_format($place['distance'], 1); ?> km from Mawanella</span>
+            <span style="position: absolute; bottom: 10px; left: 12px; font-size: 0.73rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: <?= $badgeColor; ?>; color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+              <i class="fa-solid <?= $badgeIcon; ?>"></i> <?= $badgeText; ?>
+            </span>
           </div>
 
           <div class="card-body">
