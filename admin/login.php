@@ -35,10 +35,10 @@ if (isset($_POST['login'])) {
                     
                     redirect("dashboard.php");
                 } else {
-                    $errorMsg = "Invalid password.";
+                    $errorMsg = "Invalid username or password.";
                 }
             } else {
-                $errorMsg = "Admin user not found.";
+                $errorMsg = "Invalid username or password.";
             }
             mysqli_stmt_close($stmt);
         }
