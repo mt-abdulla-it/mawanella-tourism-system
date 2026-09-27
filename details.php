@@ -40,6 +40,8 @@ while($row = mysqli_fetch_assoc($img_res)){
     $images[] = $row['image_path'];
 }
 mysqli_stmt_close($img_stmt);
+
+$displayImages = count($images) > 0 ? $images : ['https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80'];
 ?>
 
 <div class="container details-page-container animate-fade-up">
@@ -68,21 +70,13 @@ mysqli_stmt_close($img_stmt);
 
     <!-- Premium Image Gallery -->
     <div style="margin-bottom: 30px;" class="animate-fade-up delay-100">
-      <?php if (count($images) > 0): ?>
-        <div class="premium-gallery">
-          <?php foreach($images as $index => $img): ?>
-            <div class="gallery-item" onclick="openLightbox(<?= $index ?>)">
+      <div class="premium-gallery">
+        <?php foreach($displayImages as $index => $img): ?>
+          <div class="gallery-item" onclick="openLightbox(<?= $index ?>)">
             <img src="<?= escape($img); ?>" alt="<?= escape($place['name']); ?> - Image <?= $index + 1; ?>" loading="lazy">
-            </div>
-          <?php endforeach; ?>
-        </div>
-      <?php else: ?>
-        <div class="premium-gallery">
-          <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=1200&q=80" alt="Default Image" loading="lazy">
           </div>
-        </div>
-      <?php endif; ?>
+        <?php endforeach; ?>
+      </div>
     </div>
 
     <div class="details-grid animate-fade-up delay-200">
@@ -104,6 +98,10 @@ mysqli_stmt_close($img_stmt);
           <div>
             <h3><i class="fa-solid fa-hourglass-half"></i> Visit Time</h3>
             <p><?= escape($place['estimated_time']); ?></p>
+          </div>
+          <div>
+            <h3><i class="fa-solid fa-shield-halved"></i> Safe Visit Time</h3>
+            <p><?= !empty($place['safe_visit_time']) ? escape($place['safe_visit_time']) : 'Any time during opening hours'; ?></p>
           </div>
           <div>
             <h3><i class="fa-solid fa-ticket"></i> Entrance Fee</h3>
@@ -268,7 +266,7 @@ mysqli_stmt_close($img_stmt);
 
 <script>
 // Lightbox Javascript Logic
-const images = <?= json_encode($images); ?>;
+const images = <?= json_encode($displayImages); ?>;
 let currentIndex = 0;
 const lightbox = document.getElementById('galleryLightbox');
 const lightboxImg = document.getElementById('lightboxImage');
