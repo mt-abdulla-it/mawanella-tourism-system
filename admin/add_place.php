@@ -1,11 +1,11 @@
 <?php
+// Add Place Page
 require_once '../config/db.php';
-// check admin session using helper function
 check_admin();
 
 $error = '';
 
-// Mawanella has waterfalls, temples and monuments so category dropdown is important
+// Get categories
 $categories = get_categories($conn);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -25,8 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $travelTime = trim($_POST['travel_time']);
             $dist = floatval($_POST['distance']);
             $estTime = trim($_POST['estimated_time']);
+            $safeTime = trim($_POST['safe_visit_time']);
             $lat = !empty($_POST['latitude']) ? floatval($_POST['latitude']) : null;
             $lng = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
+            $mapEmbed = !empty($_POST['map_embed']) ? trim($_POST['map_embed']) : null;
             $facil = trim($_POST['facilities']);
             $fees = trim($_POST['entrance_fees']);
 
@@ -52,11 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 if (empty($error)) {
-                    $stmt = mysqli_prepare($conn, "INSERT INTO places (name, category_id, description, opening_hours, travel_tips, local_cuisine, travel_routes, travel_time, distance, estimated_time, latitude, longitude, facilities, entrance_fees) 
-                                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt = mysqli_prepare($conn, "INSERT INTO places (name, category_id, description, opening_hours, travel_tips, local_cuisine, travel_routes, travel_time, distance, estimated_time, safe_visit_time, latitude, longitude, map_embed, facilities, entrance_fees) 
+                                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     
-                    mysqli_stmt_bind_param($stmt, "sissssssdsddss", 
-                        $name, $catId, $desc, $hours, $tips, $cuisine, $routes, $travelTime, $dist, $estTime, $lat, $lng, $facil, $fees
+                    mysqli_stmt_bind_param($stmt, "sissssssdssddsss", 
+                        $name, $catId, $desc, $hours, $tips, $cuisine, $routes, $travelTime, $dist, $estTime, $safeTime, $lat, $lng, $mapEmbed, $facil, $fees
                     );
 
                     if (mysqli_stmt_execute($stmt)) {
@@ -65,6 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         // handle multiple images upload
                         if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
+                            $targetDir = __DIR__ . '/../assets/images/places';
+                            if (!file_exists($targetDir)) {
+                                mkdir($targetDir, 0755, true);
+                            }
+
                             $total = count($_FILES['images']['name']);
                             $is_first = true;
 
@@ -75,9 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
                                     $allowed = ['jpg', 'jpeg', 'png', 'webp'];
                                     
-                                    if (in_array($ext, $allowed)) {
+                                    // Security check: verify extension and actual image file type
+                                    if (in_array($ext, $allowed) && @getimagesize($tmpName) !== false) {
                                         $newName = uniqid() . '_' . $i . '.' . $ext;
-                                        $dest = __DIR__ . '/../assets/images/places/' . $newName;
+                                        $dest = $targetDir . '/' . $newName;
                                         if (move_uploaded_file($tmpName, $dest)) {
                                             $img_path = 'assets/images/places/' . $newName;
                                             $is_primary = $is_first ? 1 : 0;
@@ -108,34 +116,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add New Place - Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="admin-bg">
+  <div class="admin-layout">
+    <div id="admin-sidebar-overlay" class="admin-sidebar-overlay"></div>
 
-  <div class="container">
-    <div class="form-card form-card-large">
-      
-      <div class="admin-form-header">
-        <h2><i class="fa-solid fa-plus-circle"></i> Add New Place</h2>
-        <a href="dashboard.php" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Cancel</a>
+    <!-- Desktop Sidebar & Mobile Drawer -->
+    <aside id="admin-sidebar" class="admin-sidebar">
+      <div class="sidebar-header">
+        <a href="../index.php" class="sidebar-logo">
+          <i class="fa-solid fa-compass"></i> Mawanella <span>Tourism</span>
+        </a>
       </div>
 
-      <?php if (!empty($error)): ?>
-        <div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i> <?= escape($error); ?></div>
-      <?php endif; ?>
+      <ul class="sidebar-menu">
+        <li class="sidebar-nav-item">
+          <a href="dashboard.php"><i class="fa-solid fa-layer-group"></i> Manage Places</a>
+        </li>
+        <li class="sidebar-nav-item active">
+          <a href="add_place.php"><i class="fa-solid fa-plus-circle"></i> Add New Place</a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="manage_admins.php"><i class="fa-solid fa-users-gear"></i> Admin Users</a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="../index.php" target="_blank"><i class="fa-solid fa-globe"></i> View Public Site</a>
+        </li>
+        <li class="sidebar-nav-item" style="margin-top: auto;">
+          <a href="logout.php" style="color: #f87171;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </li>
+      </ul>
 
-      <form action="add_place.php" method="POST" enctype="multipart/form-data">
-        <!-- Include Shared Form Fields -->
-        <?php include 'form_fields.php'; ?>
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-card">
+          <p style="margin:0; font-weight:700; color:#e2e8f0;">Admin Dashboard v1.0</p>
+          <p style="margin:4px 0 0; font-size:0.78rem; color:#64748b;">Mawanella Day-Visit System</p>
+        </div>
+      </div>
+    </aside>
 
-        <button type="submit" name="save_place" class="btn btn-primary btn-full-width">
-          <i class="fa-solid fa-save"></i> Save Place
-        </button>
-      </form>
+    <main class="admin-main-content">
+      <!-- Admin Top Navigation Bar -->
+      <header class="admin-top-bar">
+        <div class="admin-top-left">
+          <button id="admin-drawer-toggle" class="admin-drawer-toggle" aria-label="Toggle Sidebar Menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div>
+            <h2 style="font-size:1.2rem; font-weight:800; color:var(--text-main); margin:0; line-height:1.2;">Add New Place</h2>
+            <span class="admin-top-subtitle" style="font-size:0.8rem; color:var(--text-muted);">Create a new tourist destination entry</span>
+          </div>
+        </div>
 
-    </div>
+        <div class="admin-top-right">
+          <button id="theme-toggle" class="btn-theme-toggle" title="Toggle Dark Mode" style="background:var(--input-bg); border:1px solid var(--border-color); color:var(--text-main); width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+
+          <div class="admin-profile-badge">
+            <div class="admin-profile-avatar"><?= strtoupper(substr($_SESSION['admin_user'] ?? 'A', 0, 1)); ?></div>
+            <span><strong><?= escape($_SESSION['admin_user']); ?></strong></span>
+          </div>
+
+          <a href="logout.php" class="btn btn-danger btn-admin-action" style="padding: 8px 14px;">
+            <i class="fa-solid fa-right-from-bracket"></i> <span class="btn-logout-text">Logout</span>
+          </a>
+        </div>
+      </header>
+
+
+      <div class="form-card form-card-large">
+        <div class="admin-form-header">
+          <h2><i class="fa-solid fa-plus-circle"></i> Place Information</h2>
+          <a href="dashboard.php" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back to List</a>
+        </div>
+
+        <?php if (!empty($error)): ?>
+          <div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i> <?= escape($error); ?></div>
+        <?php endif; ?>
+
+        <form action="add_place.php" method="POST" enctype="multipart/form-data">
+          <!-- Include Shared Form Fields -->
+          <?php include 'form_fields.php'; ?>
+
+          <button type="submit" name="save_place" class="btn btn-primary btn-full-width">
+            <i class="fa-solid fa-save"></i> Save Place
+          </button>
+        </form>
+      </div>
+    </main>
   </div>
 
+
+  <script src="../assets/js/main.js"></script>
 </body>
 </html>

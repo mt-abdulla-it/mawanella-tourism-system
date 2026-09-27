@@ -47,6 +47,11 @@
 </div>
 
 <div class="form-group">
+  <label for="safe_visit_time">Safe Time to Visit <span style="color:#d97706; font-size: 0.8rem; margin-left:10px;"><i class="fa-solid fa-clock"></i> Best/Safe hours</span></label>
+  <input type="text" id="safe_visit_time" name="safe_visit_time" placeholder="e.g. 8:00 AM to 2:00 PM (Avoid late evenings)" value="<?= isset($place['safe_visit_time']) ? escape($place['safe_visit_time']) : ''; ?>">
+</div>
+
+<div class="form-group">
   <label for="travel_tips">Travel & Safety Tips</label>
   <textarea id="travel_tips" name="travel_tips" rows="2" placeholder="Wear proper trekking shoes, carry water..."><?= isset($place['travel_tips']) ? escape($place['travel_tips']) : ''; ?></textarea>
 </div>
@@ -109,11 +114,17 @@
 <div class="form-grid-2">
   <div class="form-group">
     <label for="latitude">Latitude (Google Map)</label>
-    <input type="number" step="any" id="latitude" name="latitude" placeholder="e.g. 7.2515" value="<?= isset($place['latitude']) ? escape($place['latitude']) : ''; ?>">
+    <input type="number" step="any" id="latitude" name="latitude" placeholder="e.g. 7.2609035" value="<?= isset($place['latitude']) ? escape($place['latitude']) : ''; ?>">
   </div>
 
   <div class="form-group">
     <label for="longitude">Longitude (Google Map)</label>
-    <input type="number" step="any" id="longitude" name="longitude" placeholder="e.g. 80.4491" value="<?= isset($place['longitude']) ? escape($place['longitude']) : ''; ?>">
+    <input type="number" step="any" id="longitude" name="longitude" placeholder="e.g. 80.4199405" value="<?= isset($place['longitude']) ? escape($place['longitude']) : ''; ?>">
   </div>
 </div>
+
+<div class="form-group">
+  <label for="map_embed">Google Maps Embed HTML Code (Optional &lt;iframe&gt;)</label>
+  <textarea id="map_embed" name="map_embed" rows="3" placeholder="Paste &lt;iframe src='...'&gt;&lt;/iframe&gt; code from Google Maps share modal"><?= isset($place['map_embed']) ? escape($place['map_embed']) : ''; ?></textarea>
+</div>
+
