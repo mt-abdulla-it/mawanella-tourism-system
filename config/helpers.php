@@ -1,6 +1,5 @@
 <?php
-// helper functions for mawanella tourism project
-// student: abdulla mt (E2410182)
+// Helper utilities
 
 function escape($str) {
     return htmlspecialchars(trim($str ?? ''), ENT_QUOTES, 'UTF-8');
