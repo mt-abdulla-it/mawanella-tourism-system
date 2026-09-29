@@ -64,14 +64,14 @@
             <small style="color: var(--text-muted);">Ambulance (Suwa Seriya): 1990</small>
           </div>
           <div class="emergency-card">
-            <h4><i class="fa-solid fa-user-shield" style="color: #10b981;"></i> Tourist Police Hotline</h4>
+            <h4><i class="fa-solid fa-headset" style="color: #10b981;"></i> Sri Lanka Tourism Hotline</h4>
             <p>1912</p>
-            <small style="color: var(--text-muted);">24/7 Islandwide Tourist Helpline</small>
+            <small style="color: var(--text-muted);">Tourism Information & Visitor Assistance</small>
           </div>
           <div class="emergency-card">
-            <h4><i class="fa-solid fa-cloud-showers-heavy" style="color: #f59e0b;"></i> Disaster Management (DMC)</h4>
+            <h4><i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b;"></i> Disaster Management Centre (DMC)</h4>
             <p>117</p>
-            <small style="color: var(--text-muted);">Weather & Flash Flood Alerts</small>
+            <small style="color: var(--text-muted);">Emergency & Disaster Information</small>
           </div>
         </div>
 
