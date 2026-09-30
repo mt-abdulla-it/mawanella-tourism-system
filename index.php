@@ -4,16 +4,16 @@ require_once 'config/db.php';
 
 require_once 'includes/header.php';
 
-// Mawanella area has waterfalls, cave temples and wildlife parks
+// Get categories
 $catQuery = "SELECT * FROM categories ORDER BY category_id ASC";
 $catRes = mysqli_query($conn, $catQuery);
 
-// filter and search checks
+// Filter and search
 $catFilter = isset($_GET['category']) ? intval($_GET['category']) : 0;
 $maxDist = isset($_GET['max_dist']) ? floatval($_GET['max_dist']) : 0;
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-// prepared query for security
+// Build query
 $sql = "SELECT p.*, c.category_name, 
                (SELECT image_path FROM place_images WHERE place_id = p.place_id ORDER BY is_primary DESC, image_id ASC LIMIT 1) as primary_image 
         FROM places p 
@@ -66,6 +66,9 @@ $placesRes = mysqli_stmt_get_result($stmt);
     <form action="index.php" method="GET" class="search-box animate-fade-up delay-100">
       <?php if ($catFilter > 0): ?>
         <input type="hidden" name="category" value="<?= $catFilter; ?>">
+      <?php endif; ?>
+      <?php if ($maxDist > 0): ?>
+        <input type="hidden" name="max_dist" value="<?= $maxDist; ?>">
       <?php endif; ?>
       <input type="text" name="search" placeholder="Search places..." value="<?= escape($search); ?>">
       <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
@@ -171,7 +174,7 @@ $placesRes = mysqli_stmt_get_result($stmt);
     <?php if (mysqli_num_rows($placesRes) > 0): ?>
       <?php while ($place = mysqli_fetch_assoc($placesRes)): ?>
         <?php 
-            $imgSrc = (!empty($place['primary_image']) && file_exists($place['primary_image'])) 
+            $imgSrc = (!empty($place['primary_image']) && file_exists(__DIR__ . '/' . $place['primary_image'])) 
                       ? escape($place['primary_image']) 
                       : "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=500&q=80";
 
@@ -202,8 +205,8 @@ $placesRes = mysqli_stmt_get_result($stmt);
           <div class="card-header">
             <img src="<?= $imgSrc; ?>" alt="<?= escape($place['name']); ?>" loading="lazy">
             <span class="category-badge"><?= escape($place['category_name']); ?></span>
-            <span class="distance-badge"><i class="fa-solid fa-location-dot"></i> <?= number_format($place['distance'], 1); ?> km from Mawanella</span>
-            <span style="position: absolute; bottom: 10px; left: 12px; font-size: 0.73rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: <?= $badgeColor; ?>; color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+            <span class="distance-badge"><i class="fa-solid fa-location-dot"></i> <?= number_format($place['distance'], 1); ?> km</span>
+            <span style="position: absolute; bottom: 12px; left: 12px; font-size: 0.73rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: <?= $badgeColor; ?>; color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.25); z-index: 2;">
               <i class="fa-solid <?= $badgeIcon; ?>"></i> <?= $badgeText; ?>
             </span>
           </div>

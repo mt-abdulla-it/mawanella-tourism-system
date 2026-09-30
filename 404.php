@@ -1,4 +1,6 @@
 <?php
+require_once 'config/db.php';
+$page_title = '404 Not Found';
 require_once 'includes/header.php';
 ?>
 
