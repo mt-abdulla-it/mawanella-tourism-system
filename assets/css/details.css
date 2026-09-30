@@ -36,12 +36,20 @@
   text-transform: uppercase;
 }
 
-#map-container {
+#map-container, .map-embed-container {
   height: 380px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.map-embed-container iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 350px;
+  border: 0 !important;
+  display: block;
 }
 
 /* planner summary and list */
@@ -308,7 +316,7 @@
   color: #fcd34d;
 }
 [data-theme="dark"] .planner-item-index {
-  border-color: var(--bg-color);
+  border-color: var(--card-bg);
 }
 
 /* Print Itinerary Feature */
