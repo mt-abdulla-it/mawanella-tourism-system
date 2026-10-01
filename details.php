@@ -37,7 +37,9 @@ mysqli_stmt_bind_param($img_stmt, "i", $id);
 mysqli_stmt_execute($img_stmt);
 $img_res = mysqli_stmt_get_result($img_stmt);
 while($row = mysqli_fetch_assoc($img_res)){
-    $images[] = $row['image_path'];
+    if (!empty($row['image_path']) && file_exists(__DIR__ . '/' . $row['image_path'])) {
+        $images[] = $row['image_path'];
+    }
 }
 mysqli_stmt_close($img_stmt);
 
@@ -112,7 +114,7 @@ $displayImages = count($images) > 0 ? $images : ['https://images.unsplash.com/ph
         <?php if (!empty($place['travel_routes'])): ?>
           <div class="info-block">
             <h3><i class="fa-solid fa-route"></i> Travel Routes</h3>
-            <p><?= escape($place['travel_routes']); ?></p>
+            <p><?= nl2br(escape($place['travel_routes'])); ?></p>
           </div>
         <?php endif; ?>
 
@@ -182,22 +184,54 @@ $displayImages = count($images) > 0 ? $images : ['https://images.unsplash.com/ph
           <i class="fa-solid fa-map-location-dot"></i> Map Location
         </h3>
         
-        <?php if (!empty($place['latitude']) && !empty($place['longitude'])): ?>
-          <div id="map-container" data-lat="<?= escape($place['latitude']); ?>" data-lng="<?= escape($place['longitude']); ?>" data-title="<?= escape($place['name']); ?>">
-            <!-- Map renders here -->
+        <?php
+          $hasCoords = !empty($place['latitude']) && !empty($place['longitude']) && floatval($place['latitude']) != 0;
+          $dirOrigin = 'Mawanella,+Sri+Lanka';
+          $dirDestination = urlencode($place['name'] . ', Sri Lanka');
+        ?>
+
+        <?php if (!empty($place['map_embed']) && stripos($place['map_embed'], '<iframe') !== false): ?>
+          <div class="map-embed-container">
+            <?= $place['map_embed']; ?>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px;">
+            <p class="map-desc" style="margin: 0;">
+              <?php if ($hasCoords): ?>
+                <i class="fa-solid fa-location-arrow"></i> Coordinates: <?= escape($place['latitude']); ?>, <?= escape($place['longitude']); ?>
+              <?php else: ?>
+                <i class="fa-solid fa-location-dot"></i> <?= number_format($place['distance'], 1); ?> km from Mawanella
+              <?php endif; ?>
+            </p>
+            <a href="https://www.google.com/maps/dir/?api=1&origin=<?= $dirOrigin; ?>&destination=<?= $dirDestination; ?>" 
+               target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 10px 18px; font-size: 0.92rem; font-weight: 600; border-radius: 8px;">
+               <i class="fa-solid fa-diamond-turn-right"></i> Get Directions From Mawanella
+            </a>
+          </div>
+        <?php elseif ($hasCoords): ?>
+          <div id="map-container" data-lat="<?= escape($place['latitude']); ?>" data-lng="<?= escape($place['longitude']); ?>" data-title="<?= escape($place['name']); ?>" style="width:100%; height:350px; border-radius:12px; overflow:hidden; box-shadow: var(--shadow-sm);">
+            <iframe 
+              src="https://maps.google.com/maps?q=<?= escape($place['latitude']); ?>,<?= escape($place['longitude']); ?>&hl=en&z=14&output=embed" 
+              width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
+            </iframe>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px;">
             <p class="map-desc" style="margin: 0;">
               <i class="fa-solid fa-location-arrow"></i> Coordinates: <?= escape($place['latitude']); ?>, <?= escape($place['longitude']); ?>
             </p>
-            <a href="https://www.google.com/maps/dir/?api=1&origin=Mawanella,+Sri+Lanka&destination=<?= escape($place['latitude']); ?>,<?= escape($place['longitude']); ?>" 
-               target="_blank" class="btn btn-primary" style="padding: 8px 15px; font-size: 0.9rem;">
+            <a href="https://www.google.com/maps/dir/?api=1&origin=<?= $dirOrigin; ?>&destination=<?= $dirDestination; ?>" 
+               target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 10px 18px; font-size: 0.92rem; font-weight: 600; border-radius: 8px;">
                <i class="fa-solid fa-diamond-turn-right"></i> Get Directions From Mawanella
             </a>
           </div>
         <?php else: ?>
-          <div class="map-placeholder">
-            <p><i class="fa-solid fa-map-pin"></i> Map coordinates not available for this location.</p>
+          <div class="map-placeholder" style="margin-bottom: 15px;">
+            <p><i class="fa-solid fa-map-pin"></i> Interactive map coordinates not available for this location.</p>
+          </div>
+          <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+            <a href="https://www.google.com/maps/dir/?api=1&origin=<?= $dirOrigin; ?>&destination=<?= $dirDestination; ?>" 
+               target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="padding: 10px 18px; font-size: 0.92rem; font-weight: 600; border-radius: 8px;">
+               <i class="fa-solid fa-diamond-turn-right"></i> Get Directions From Mawanella
+            </a>
           </div>
         <?php endif; ?>
       </div>
@@ -206,9 +240,7 @@ $displayImages = count($images) > 0 ? $images : ['https://images.unsplash.com/ph
 
   <!-- Nearby Places Section -->
   <?php
-  // Fetch 3 nearby places based on similar distance from Mawanella
-  // (A simple proxy for 'nearby' since we don't have Haversine enabled by default, 
-  // but using a basic +/- 5km distance diff as a simple approximation)
+  // Fetch nearby places by distance
   $currentDist = floatval($place['distance']);
   $nearby_stmt = mysqli_prepare($conn, "SELECT p.*, c.category_name,
                                         (SELECT image_path FROM place_images WHERE place_id = p.place_id ORDER BY is_primary DESC, image_id ASC LIMIT 1) as primary_image
@@ -229,7 +261,7 @@ $displayImages = count($images) > 0 ? $images : ['https://images.unsplash.com/ph
     <div class="places-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
       <?php while ($nPlace = mysqli_fetch_assoc($nearbyRes)): ?>
         <?php 
-            $imgSrc = (!empty($nPlace['primary_image']) && file_exists($nPlace['primary_image'])) 
+            $imgSrc = (!empty($nPlace['primary_image']) && file_exists(__DIR__ . '/' . $nPlace['primary_image'])) 
                       ? escape($nPlace['primary_image']) 
                       : "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=500&q=80";
         ?>
