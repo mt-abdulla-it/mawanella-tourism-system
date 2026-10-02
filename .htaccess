@@ -1,1 +1,20 @@
-ErrorDocument 404 /Projact/404.php
+# Custom 404 error page
+ErrorDocument 404 /mawanella-tourism-system/404.php
+
+# Disable directory listing
+Options -Indexes
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Block direct access to config directory
+<FilesMatch "^(db|helpers)\.php$">
+    <If "%{REQUEST_URI} =~ m#/config/#">
+        Order Deny,Allow
+        Deny from all
+    </If>
+</FilesMatch>
