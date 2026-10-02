@@ -111,7 +111,7 @@ foreach ($planList as $p) {
     if (!empty($p['entrance_fees']) && strtolower($p['entrance_fees']) !== 'free') {
         preg_match_all('/\d+/', $p['entrance_fees'], $feeMatches);
         if (!empty($feeMatches[0])) {
-            $totalEntranceFees += intval(implode('', $feeMatches[0]));
+            $totalEntranceFees += array_sum($feeMatches[0]);
         }
     }
 }
@@ -197,7 +197,20 @@ foreach ($planList as $p) {
     <!-- Interactive Map showing all selected places -->
     <div class="planner-map-section animate-fade-up">
       <h3 class="planner-map-title"><i class="fa-solid fa-map-location-dot"></i> Your Itinerary Map</h3>
-      <div id="planner-map"></div>
+      <div id="planner-map" style="width: 100%; height: 400px; border-radius: 12px; overflow: hidden; position: relative;">
+        <?php
+          $waypointCoords = [];
+          foreach ($planList as $p) {
+              if (!empty($p['latitude']) && !empty($p['longitude'])) {
+                  $waypointCoords[] = floatval($p['latitude']) . ',' . floatval($p['longitude']);
+              }
+          }
+          $routeParam = !empty($waypointCoords) ? implode('+to:', $waypointCoords) : 'Mawanella,+Sri+Lanka';
+        ?>
+        <iframe src="https://maps.google.com/maps?saddr=Mawanella,+Sri+Lanka&daddr=<?= $routeParam; ?>&hl=en&z=11&output=embed"
+          width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
+        </iframe>
+      </div>
     </div>
 
     <div class="planner-list">
